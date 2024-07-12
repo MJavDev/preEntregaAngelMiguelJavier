@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
     return res
       .status(200)
       .send(
-        "Se realizo la busqueda y no se encontró ningun carrito en la base de datos"
+        "No se encontró ningun carrito en la base de datos"
       );
 });
 router.post("/", async (req, res) => {
@@ -84,7 +84,6 @@ router.post("/:idcart/:idproduct", async (req, res) => {
       cartFinded.products.push(productInCart);
       const updatedDatabase = JSON.stringify(cartsInDatabase, null, " ");
       await fs.promises.writeFile(URL, updatedDatabase);
-      //fs.writeFileSync(URL, updatedDatabase);Metodo sincrónico
       return res.send(
         "Se agregó el producto con id:" +
           req.params.idproduct +
