@@ -9,10 +9,8 @@ router.get("/", async (req, res) => {
   const productsInDataBase = JSON.parse(
     await fs.promises.readFile(URL, "utf-8")
   );
-  const limit = req.query.limit;
-  //Envia un query para limitar los resultamos mostrados
-  const productsToShow = productsInDataBase.slice(0, limit);
-  //Verifica que existan productos cargados en la base de datos
+  const limit = req.query.limit;
+  const productsToShow = productsInDataBase.slice(0, limit);
   if (productsToShow.length) {
     return res.send(productsToShow);
   } else
@@ -28,8 +26,7 @@ router.get("/:id", async (req, res) => {
   );
   const productFinded = productsInDataBase.find(
     (item) => item.id == req.params.id
-  );
-  //Verifica que exista el producto con ese id
+  );
   if (productFinded) {
     return res.send(productFinded);
   } else {
@@ -52,7 +49,6 @@ router.post("/", async (req, res) => {
   const price = req.body.price;
   const stock = req.body.stock;
   const category = req.body.category;
-  //Valida que el req.body venga completo con todos los campos obligatorios y luego valida que sean del tipo de dato correspondiente
   if (title && description && code && price && stock && category) {
     if (typeof title !== "string") {
       return res.send("El campo title debe ser un texto (string)");
@@ -79,8 +75,6 @@ router.post("/", async (req, res) => {
         );
       }
     }
-
-    //Función que genera cada nuevo id
     const newId = () => {
       if (productsInDataBase.length) {
         const lastProduct = productsInDataBase[productsInDataBase.length - 1];
@@ -90,39 +84,30 @@ router.post("/", async (req, res) => {
         return 1;
       }
     };
-    //Guardo el nuevo producto con su id en una nueva const y luego lo agrego al dataBase
     const newProductWithId = { ...req.body, status: true, id: newId() };
-    productsInDataBase.push(newProductWithId);
-    //Paso el nuevo dataBase a formato JSON para poder hacer la persistencia de los datos
+    productsInDataBase.push(newProductWithId);
     const updatedDatabase = JSON.stringify(productsInDataBase, null, " ");
-    //Realizo la persistencia de la base de datos actualizada
-
-    //fs.writeFileSync(URL, updatedDatabase);//Metodo sincrónico
-    await fs.promises.writeFile(URL, updatedDatabase);
-
+    await fs.promises.writeFile(URL, updatedDatabase);
     return res.send("Se agregó correctamente el producto.");
   } else {
     return res.send(
-      "Es requisito que complete todos los campos (el campo thumbnails si puede quedar vacio)"
+      "Completar todos los campos (el campo thumbnails si puede quedar vacio)"
     );
   }
 });
 router.put("/:id", async (req, res) => {
   const productsInDataBase = JSON.parse(
     await fs.promises.readFile(URL, "utf-8")
-  );
-  //Verifica que exista el producto con ese id en la base de datos
+  );
   const result = productsInDataBase.find((item) => item.id == req.params.id);
 
-  if (result) {
-    //Agregar validaciones del req.body
+  if (result) {
     const title = req.body.title;
     const description = req.body.description;
     const code = req.body.code;
     const price = req.body.price;
     const stock = req.body.stock;
     const category = req.body.category;
-    //Valida que el req.body venga completo con todos los campos obligatorios y luego valida que sean del tipo de dato correspondiente
     if (title && description && code && price && stock && category) {
       if (typeof title !== "string") {
         return res.send("El campo title debe ser un texto (string)");
@@ -162,15 +147,11 @@ router.put("/:id", async (req, res) => {
       if (req.body.thumbnails) {
         result.thumbnails = req.body.thumbnails;
       }
-
-      //Paso el nuevo dataBase a formato JSON para poder hacer la persistencia de los datos
       const updatedDatabase = JSON.stringify(productsInDataBase, null, " ");
-      //Realizo la persistencia de la base de datos actualizada
       await fs.promises.writeFile(URL, updatedDatabase);
-      //fs.writeFileSync(URL, updatedDatabase);//Metodo sincrónico
 
       return res.send(
-        "Se mofifico el producto con id: " + req.params.id + " correctamente"
+        "Se modificó el producto con id: " + req.params.id + " correctamente"
       );
     }
   } else {
@@ -179,17 +160,14 @@ router.put("/:id", async (req, res) => {
       .send(
         "El producto con el id:" +
           req.params.id +
-          " no se encuentra en la base de datos"
+          " No se encuentra en BBDD"
       );
   }
 });
-//Borrado permanente del producto
 router.delete("/:id", async (req, res) => {
   const productsInDataBase = JSON.parse(
     await fs.promises.readFile(URL, "utf-8")
   );
-  //Verifica que exista el producto con ese id
-
   const indexProductoToDelete = productsInDataBase.findIndex(
     (item) => item.id == req.params.id
   );
@@ -197,19 +175,17 @@ router.delete("/:id", async (req, res) => {
   if (indexProductoToDelete > -1) {
     productsInDataBase.splice(indexProductoToDelete, 1);
 
-    const updatedDatabase = JSON.stringify(productsInDataBase, null, " ");
-
-    //fs.writeFileSync(URL, updatedDatabase);//Metodo sincrónico
+    const updatedDatabase = JSON.stringify(productsInDataBase, null, " ");
     await fs.promises.writeFile(URL, updatedDatabase);
 
-    return res.send("Se borro el producto con éxito");
+    return res.send("Producto borrado");
   } else {
     return res
       .status(404)
       .send(
         "El producto con el id:" +
           req.params.id +
-          " no se encuentra en la base de datos"
+          " No se encuentra en BBDD"
       );
   }
 });
