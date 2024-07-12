@@ -69,8 +69,7 @@ router.post("/:idcart/:idproduct", async (req, res) => {
     if (productExistInCart) {
       productExistInCart.quantity++;
       const updatedDatabase = JSON.stringify(cartsInDatabase, null, " ");
-      await fs.promises.writeFile(URL, updatedDatabase);
-      //s.writeFileSync(URL, updatedDatabase);Metodo sincrónico
+      await fs.promises.writeFile(URL, updatedDatabase);
       return res.send(
         "Se agregó una unidad mas del producto con id:" +
           req.params.idproduct +
